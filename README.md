@@ -29,4 +29,33 @@ We hypothesize that resistant strains of *C. auris* will:
 - [FigTree](https://github.com/rambaut/figtree) / [iTOL](https://itol.embl.de/) – Tree visualization
 - Python / R – Data processing and plotting
 
+- ### 🧰 HPC Software Availability
+We verified the following tools are available on the MSU HPC:
+
+- MAFFT
+- MUSCLE
+- BLAST+
+- FastQC
+- FastTree
+- sratoolkit
+
+These tools will be used for alignment, gene identification, quality control, and tree construction.
+
+### 🔧 Tools to Be Installed
+We may need to install:
+- FigTree (used locally for tree visualization)
+- iTOL (web-based, no install required)
+
+
+## 📋 How to Run the Analysis
+
+### 📂 SRA Datasets
+We are using publicly available *Candida auris* genome data from the NCBI Sequence Read Archive (SRA). Accession numbers are listed in `accession_list.txt`.
+
+We selected 15 isolates from different geographic regions and clades, including samples from the United States, United Kingdom, Colombia, Iran, and South Africa. The list also includes representatives from key phylogenetic clades (South Asian, South American, and South African) and samples that are non-clinical in nature.
+
+To download the datasets, use:
+```bash
+prefetch --option-file accession_list.txt
+
 ## 📁 Project Structure
