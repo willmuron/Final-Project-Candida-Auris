@@ -7,6 +7,8 @@ This project investigates the evolutionary relationships among antifungal resist
 ## 🧠 Biological Problem
 *Candida auris* is an emerging, multidrug-resistant fungal pathogen responsible for hospital outbreaks and invasive infections. The rapid global spread and difficulty in treatment make it a public health concern. By studying the evolution of its resistance genes, we aim to better understand its resistance mechanisms and potential transmission pathways.
 
+"How have antifungal resistance genes in Candida auris evolved, and what mutations are associated with resistance in different clinical isolates?"
+
 ## 🧪 Hypothesis
 We hypothesize that resistant strains of *C. auris* will:
 - Contain shared mutations in key resistance genes.
