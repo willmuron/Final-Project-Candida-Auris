@@ -28,4 +28,3 @@ We hypothesize that resistant strains of *C. auris* will:
 - Python / R – Data processing and plotting
 
 ## 📁 Project Structure
-Student-Led-Tutorial-3-CandidaAuris/ ├── data/ # Raw genome and gene sequence files ├── alignments/ # Output of MAFFT/MUSCLE alignments ├── trees/ # Phylogenetic tree files (Newick format) ├── scripts/ # Scripts used for alignment and analysis ├── results/ # Plots and findings ├── README.md # Project overview and documentation
