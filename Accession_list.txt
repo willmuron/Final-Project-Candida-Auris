@@ -13,3 +13,21 @@ SRR10461248: Isolate B12098. ​
 SRR13269545: Isolate from Iran, 2018. ​
 SRR25919466: Additional isolate data associated with strain B11103. 
 SRR25919467: Additional isolate data associated with strain B11221.
+
+
+# Accession List for Candida auris Project
+SRR7140069  # Colombia, 2016
+SRR7140058  # Colombia, 2016
+SRR7976608  # United Kingdom, 2017
+SRR7976553  # United Kingdom, 2017
+SRR12073484 # Florida, USA
+SRR7909359  # Indiana, USA
+SRR25919465 # B11103 - South Asian clade
+SRR25919458 # B11221 - South African clade
+SRR25919459 # B11244 - South American clade
+SRR10461252 # Isolate B12094
+SRR10461249 # Isolate B12097
+SRR10461248 # Isolate B12098
+SRR13269545 # Iran, 2018
+SRR25919466 # Additional data for B11103
+SRR25919467 # Additional data for B11221
