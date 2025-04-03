@@ -1,4 +1,3 @@
-# Final-Project
 # Phylogenetic Analysis of Antifungal Resistance Genes in *Candida auris*
 
 ## 🧬 Project Overview
@@ -6,8 +5,6 @@ This project investigates the evolutionary relationships among antifungal resist
 
 ## 🧠 Biological Problem
 *Candida auris* is an emerging, multidrug-resistant fungal pathogen responsible for hospital outbreaks and invasive infections. The rapid global spread and difficulty in treatment make it a public health concern. By studying the evolution of its resistance genes, we aim to better understand its resistance mechanisms and potential transmission pathways.
-
-"How have antifungal resistance genes in Candida auris evolved, and what mutations are associated with resistance in different clinical isolates?"
 
 ## 🧪 Hypothesis
 We hypothesize that resistant strains of *C. auris* will:
@@ -20,76 +17,18 @@ We hypothesize that resistant strains of *C. auris* will:
 - Construct phylogenetic trees using RAxML or FastTree.
 - Identify clustering patterns and evolutionary trends associated with resistance.
 
-## 🛠️ Tools and Technologies
-- [MAFFT](https://mafft.cbrc.jp/alignment/software/) – Sequence alignment
-- [MUSCLE](https://www.drive5.com/muscle/) – Sequence alignment
-- [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi) – Gene identification
-- [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/) – Phylogenetic tree construction
-- [FastTree](http://www.microbesonline.org/fasttree/) – Alternative tree-building method
-- [FigTree](https://github.com/rambaut/figtree) / [iTOL](https://itol.embl.de/) – Tree visualization
-- Python / R – Data processing and plotting
+---
 
-- ### 🧰 HPC Software Availability
-We verified the following tools are available on the MSU HPC:
+## 🔬 Analysis Workflow
 
-- MAFFT
-- MUSCLE
-- BLAST+
-- FastQC
-- FastTree
-- sratoolkit
-
-These tools will be used for alignment, gene identification, quality control, and tree construction.
-
-### 🔧 Tools to Be Installed
-We may need to install:
-- FigTree (used locally for tree visualization)
-- iTOL (web-based, no install required)
-
-
-## 📋 How to Run the Analysis
-
-### 📂 SRA Datasets
-We are using publicly available *Candida auris* genome data from the NCBI Sequence Read Archive (SRA). Accession numbers are listed in `accession_list.txt`.
-
-We selected 15 isolates from different geographic regions and clades, including samples from the United States, United Kingdom, Colombia, Iran, and South Africa. The list also includes representatives from key phylogenetic clades (South Asian, South American, and South African) and samples that are non-clinical in nature.
-
-To download the datasets, use:
-```bash
-prefetch --option-file accession_list.txt
-
-## 🔬 Project Workflow
-
-This section outlines the step-by-step procedure we are using to complete our analysis of antifungal resistance genes in *Candida auris*.
+### ✅ Step 1: Define Biological Question
+This step is outlined above in the **Biological Problem** and **Hypothesis** sections.
 
 ---
 
-### ✅ Current Status
-- ✔️ Project topic defined
-- ✔️ Data collection plan created
-- ✔️ `accession_list.txt` with SRR IDs completed
-- ✔️ Project README structured and documented
-
----
-
-### 🔄 Next Steps
-
-#### **1. Download Raw Data**
-Use the NCBI SRA Toolkit to download the raw FASTQ data:
+### 📥 Step 2: Download Raw Data
 
 ```bash
-# Download using accession list
-prefetch --option-file accession_list.txt
-
-# Convert .sra files to .fastq
-for sra in $(cat accession_list.txt); do
-    fastq-dump --split-files $sra
-done
-
-# ===============================
-# STEP 1: Download Raw FASTQ Data
-# ===============================
-
 # Download all SRA files listed in accession_list.txt
 prefetch --option-file accession_list.txt
 
@@ -97,72 +36,110 @@ prefetch --option-file accession_list.txt
 for sra in $(cat accession_list.txt); do
     fastq-dump --split-files $sra
 done
+```
 
-# ===============================
-# STEP 2: Run Quality Control
-# ===============================
+---
 
+### ✅ Step 3: Quality Control
+
+```bash
 # Create a directory to hold FastQC reports
 mkdir -p fastqc_reports
 
 # Run FastQC on all downloaded FASTQ files
 fastqc *.fastq -o fastqc_reports
+```
 
-# ===============================
-# STEP 3: (Optional) Trim Reads
-# ===============================
+---
 
+### ✂️ Step 4: (Optional) Read Trimming
+
+```bash
 # Example Trimmomatic command for paired-end trimming
-# (Run only if FastQC reports indicate issues)
-trimmomatic PE SRRXXXX_1.fastq SRRXXXX_2.fastq \
-  SRRXXXX_1_trimmed.fastq SRRXXXX_1_unpaired.fastq \
-  SRRXXXX_2_trimmed.fastq SRRXXXX_2_unpaired.fastq \
-  SLIDINGWINDOW:4:20 MINLEN:50
+# (Edit and uncomment if needed)
+# trimmomatic PE SRRXXXX_1.fastq SRRXXXX_2.fastq \
+#   SRRXXXX_1_trimmed.fastq SRRXXXX_1_unpaired.fastq \
+#   SRRXXXX_2_trimmed.fastq SRRXXXX_2_unpaired.fastq \
+#   SLIDINGWINDOW:4:20 MINLEN:50
+```
 
-# ===============================
-# STEP 4: Extract Resistance Genes
-# ===============================
+---
 
-# OPTION A: If working with full genomes (BLAST approach)
+### 🧬 Step 5: Gene Extraction or Mapping
+
+**Option A – Full genomes with BLAST:**
+
+```bash
 makeblastdb -in genome.fasta -dbtype nucl
 blastn -query ERG11_reference.fasta -db genome.fasta -out ERG11_hits.txt
+```
 
-# OPTION B: If working with raw reads (mapping + extraction approach)
+**Option B – Raw reads mapped to reference:**
 
+```bash
 # Index the reference genome
 bwa index reference_genome.fasta
 
-# Map reads to reference genome
+# Map reads
 bwa mem reference_genome.fasta SRRXXXX_1.fastq SRRXXXX_2.fastq > mapped_reads.sam
 
-# Convert to BAM and sort
+# Convert to sorted BAM
 samtools view -Sb mapped_reads.sam | samtools sort -o sorted_reads.bam
-
-# Index the sorted BAM
 samtools index sorted_reads.bam
 
-# Extract the gene region (replace "chr:start-end" with actual coordinates)
+# Extract gene region (replace chr:start-end with actual coordinates)
 samtools faidx reference_genome.fasta chr:start-end > ERG11_sequence.fasta
+```
 
-# ===============================
-# STEP 5: Multiple Sequence Alignment
-# ===============================
+---
 
-# Align gene sequences using MAFFT
+### 🧬 Step 6: Multiple Sequence Alignment
+
+```bash
 mafft --auto resistance_genes.fasta > aligned_genes.fasta
+```
 
-# ===============================
-# STEP 6: Phylogenetic Tree Construction
-# ===============================
+---
 
-# OPTION A: Use FastTree (quick method)
+### 🌲 Step 7: Phylogenetic Tree Construction
+
+**Option A – FastTree:**
+
+```bash
 FastTree -nt aligned_genes.fasta > resistance_tree.nwk
+```
 
-# OPTION B: Use RAxML (maximum likelihood + bootstrap)
+**Option B – RAxML:**
+
+```bash
 raxmlHPC -s aligned_genes.fasta -n resistance_tree -m GTRGAMMA -p 12345 -# 100
+```
 
-# ===============================
-# OUTPUT: Tree file is in Newick format (.nwk)
-# Visualize using iTOL or FigTree
-# ===============================
+---
 
+### 🌳 Step 8: Tree Visualization
+
+Use one of the following tools:
+- [iTOL (web-based)](https://itol.embl.de/)
+- [FigTree (desktop-based)](https://github.com/rambaut/figtree)
+
+Upload the `resistance_tree.nwk` file to view and annotate your tree.
+
+---
+
+### 🧬 Step 9: (Optional) Mutation Analysis
+
+Use tools like:
+- [MEGA](https://www.megasoftware.net/)
+- [Geneious](https://www.geneious.com/)
+- [SnpEff](https://pcingola.github.io/SnpEff/)
+
+To inspect and annotate specific mutations in aligned sequences.
+
+---
+
+## ✅ Final Output
+- Aligned resistance gene sequences: `aligned_genes.fasta`
+- Phylogenetic tree: `resistance_tree.nwk`
+- FastQC reports
+- Optional: mutation annotations and figures
