@@ -58,4 +58,111 @@ To download the datasets, use:
 ```bash
 prefetch --option-file accession_list.txt
 
-## 📁 Project Structure
+## 🔬 Project Workflow
+
+This section outlines the step-by-step procedure we are using to complete our analysis of antifungal resistance genes in *Candida auris*.
+
+---
+
+### ✅ Current Status
+- ✔️ Project topic defined
+- ✔️ Data collection plan created
+- ✔️ `accession_list.txt` with SRR IDs completed
+- ✔️ Project README structured and documented
+
+---
+
+### 🔄 Next Steps
+
+#### **1. Download Raw Data**
+Use the NCBI SRA Toolkit to download the raw FASTQ data:
+
+```bash
+# Download using accession list
+prefetch --option-file accession_list.txt
+
+# Convert .sra files to .fastq
+for sra in $(cat accession_list.txt); do
+    fastq-dump --split-files $sra
+done
+
+# ===============================
+# STEP 1: Download Raw FASTQ Data
+# ===============================
+
+# Download all SRA files listed in accession_list.txt
+prefetch --option-file accession_list.txt
+
+# Convert each .sra file to paired-end FASTQ files
+for sra in $(cat accession_list.txt); do
+    fastq-dump --split-files $sra
+done
+
+# ===============================
+# STEP 2: Run Quality Control
+# ===============================
+
+# Create a directory to hold FastQC reports
+mkdir -p fastqc_reports
+
+# Run FastQC on all downloaded FASTQ files
+fastqc *.fastq -o fastqc_reports
+
+# ===============================
+# STEP 3: (Optional) Trim Reads
+# ===============================
+
+# Example Trimmomatic command for paired-end trimming
+# (Run only if FastQC reports indicate issues)
+trimmomatic PE SRRXXXX_1.fastq SRRXXXX_2.fastq \
+  SRRXXXX_1_trimmed.fastq SRRXXXX_1_unpaired.fastq \
+  SRRXXXX_2_trimmed.fastq SRRXXXX_2_unpaired.fastq \
+  SLIDINGWINDOW:4:20 MINLEN:50
+
+# ===============================
+# STEP 4: Extract Resistance Genes
+# ===============================
+
+# OPTION A: If working with full genomes (BLAST approach)
+makeblastdb -in genome.fasta -dbtype nucl
+blastn -query ERG11_reference.fasta -db genome.fasta -out ERG11_hits.txt
+
+# OPTION B: If working with raw reads (mapping + extraction approach)
+
+# Index the reference genome
+bwa index reference_genome.fasta
+
+# Map reads to reference genome
+bwa mem reference_genome.fasta SRRXXXX_1.fastq SRRXXXX_2.fastq > mapped_reads.sam
+
+# Convert to BAM and sort
+samtools view -Sb mapped_reads.sam | samtools sort -o sorted_reads.bam
+
+# Index the sorted BAM
+samtools index sorted_reads.bam
+
+# Extract the gene region (replace "chr:start-end" with actual coordinates)
+samtools faidx reference_genome.fasta chr:start-end > ERG11_sequence.fasta
+
+# ===============================
+# STEP 5: Multiple Sequence Alignment
+# ===============================
+
+# Align gene sequences using MAFFT
+mafft --auto resistance_genes.fasta > aligned_genes.fasta
+
+# ===============================
+# STEP 6: Phylogenetic Tree Construction
+# ===============================
+
+# OPTION A: Use FastTree (quick method)
+FastTree -nt aligned_genes.fasta > resistance_tree.nwk
+
+# OPTION B: Use RAxML (maximum likelihood + bootstrap)
+raxmlHPC -s aligned_genes.fasta -n resistance_tree -m GTRGAMMA -p 12345 -# 100
+
+# ===============================
+# OUTPUT: Tree file is in Newick format (.nwk)
+# Visualize using iTOL or FigTree
+# ===============================
+
