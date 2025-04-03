@@ -17,6 +17,15 @@ We hypothesize that resistant strains of *C. auris* will:
 - Construct phylogenetic trees using RAxML or FastTree.
 - Identify clustering patterns and evolutionary trends associated with resistance.
 
+ ## 🛠️ Tools and Technologies
+ - [MAFFT](https://mafft.cbrc.jp/alignment/software/) – Sequence alignment
+ - [MUSCLE](https://www.drive5.com/muscle/) – Sequence alignment
+ - [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi) – Gene identification
+ - [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/) – Phylogenetic tree construction
+ - [FastTree](http://www.microbesonline.org/fasttree/) – Alternative tree-building method
+ - [FigTree](https://github.com/rambaut/figtree) / [iTOL](https://itol.embl.de/) – Tree visualization
+ - Python / R – Data processing and plotting
+
 ---
 
 ## 🔬 Analysis Workflow
