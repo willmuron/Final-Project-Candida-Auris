@@ -1,3 +1,6 @@
+
+markdown
+Copy code
 # SRA Data Processing Pipeline
 
 This pipeline automates the process of downloading sequencing data from the NCBI Sequence Read Archive (SRA), converting the data into FASTQ format, and performing quality control checks using FastQC.
@@ -12,5 +15,226 @@ Ensure that the following tools are installed and accessible in your environment
 On systems that use module management (e.g., HPC environments), load the necessary modules:
 
 ```bash
-module load s
+module load sra-toolkit/2.10.9
+module load FastQC/0.11.9
+Pipeline Overview
+The pipeline performs the following steps:
 
+Load Required Modules: Loads sra-toolkit and FastQC modules.
+
+Set Up SRA Download Directory: Defines and creates a directory for storing downloaded SRA files.
+
+Verify Accession List: Checks for the presence of accession_list.txt, which contains SRA accession numbers.
+
+Download SRA Files: Uses prefetch to download SRA files based on the accession list.
+
+Convert SRA to FASTQ: Converts the downloaded .sra files to paired-end .fastq files using fastq-dump.
+
+Run FastQC: Performs quality control checks on the generated FASTQ files and saves the reports.
+
+Usage Instructions
+Prepare the Accession List: Create a file named accession_list.txt containing the SRA accession numbers, one per line.
+
+Create the Pipeline Script: Create a script named run_pipeline.sh with the following content:
+
+bash
+Copy code
+#!/bin/bash
+
+# Load required modules
+module load sra-toolkit/2.10.9
+module load FastQC/0.11.9
+
+# Set SRA download directory
+export SRA_DIR="/mnt/scratch/${USER}_candida_sra"
+mkdir -p "$SRA_DIR"
+
+# Confirm accession list is present
+if [ ! -f accession_list.txt ]; then
+    echo "❌ accession_list.txt not found!"
+    exit 1
+fi
+
+# Step 1: Download SRA files
+echo "[1] Downloading SRA data..."
+prefetch --output-directory "$SRA_DIR" --option-file accession_list.txt
+
+# Step 2: Convert SRA to FASTQ
+echo "[2] Converting .sra to .fastq..."
+for sra in $(cat accession_list.txt); do
+    if [ -f "$SRA_DIR/$sra/$sra.sra" ]; then
+        fastq-dump --split-files --gzip --outdir fastq_files "$SRA_DIR/$sra/$sra.sra"
+    else
+        echo "⚠️ $sra.sra not found — skipping"
+    fi
+done
+
+# Step 3: Run FastQC
+echo "[3] Running FastQC..."
+mkdir -p fastqc_reports
+fastqc fastq_files/*.fastq.gz -o fastqc_reports
+
+echo "All done: SRA downloaded, FASTQ generated, FastQC complete!"
+Make the Script Executable: Run the following command to make the script executable:
+
+bash
+Copy code
+chmod +x run_pipeline.sh
+Execute the Pipeline: Run the script to start the pipeline:
+
+bash
+Copy code
+./run_pipeline.sh
+Notes
+The accession_list.txt should be in the same directory as run_pipeline.sh.
+
+The script creates two directories: fastq_files for the FASTQ files and fastqc_reports for the FastQC reports.
+
+Ensure that you have the necessary permissions for the directories specified in the script.
+
+Additional Resources
+SRA Toolkit Documentation
+
+FastQC Documentation
+
+For a visual guide on downloading SRA data and performing quality control, you may find the following video helpful:
+
+Downloading SRA data with the SRA toolkit, FastQC and ... - YouTube
+
+This README was generated to document the SRA data processing pipeline.
+
+perl
+Copy code
+
+This `README.md` provides comprehensive instructions and information about your pipeline, ensuring that users can understand and utilize it effectively.
+::contentReference[oaicite:0]{index=0}
+ 
+
+
+
+
+You said:
+The README file should have the whole pipeline please. All of the coding in the pipeline should be in the file please, thank you. I appreciate it
+
+
+ChatGPT said:
+Certainly! Below is the content for a comprehensive README.md file that outlines the pipeline for processing SRA data, including downloading, converting to FASTQ, and performing quality control with FastQC. You can save this content into a file named README.md for your project.
+
+markdown
+Copy code
+# Final Project: Candida Auris Data Processing Pipeline
+
+This pipeline facilitates the processing of Candida Auris sequencing data by automating the steps of downloading SRA files, converting them to FASTQ format, and performing quality control using FastQC.
+
+## Prerequisites
+
+Ensure that the following tools are installed and accessible in your environment:
+
+- [SRA Toolkit](https://github.com/ncbi/sra-tools) (version 2.10.9)
+- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (version 0.11.9)
+
+## Pipeline Overview
+
+The pipeline executes the following steps:
+
+1. **Set Up Environment**: Load necessary modules and set up directories.
+2. **Download SRA Data**: Retrieve sequencing data using accession numbers.
+3. **Convert SRA to FASTQ**: Transform `.sra` files into paired-end `.fastq.gz` files.
+4. **Quality Control with FastQC**: Assess the quality of the FASTQ files.
+
+## Detailed Steps
+
+### 1. Set Up Environment
+
+Load the required modules:
+
+```bash
+module load sra-toolkit/2.10.9
+module load FastQC/0.11.9
+Create and navigate to the project directory:
+
+bash
+Copy code
+mkdir -p ~/candida_project
+cd ~/candida_project
+2. Prepare Accession List
+Create a file named accession_list.txt containing the SRA accession numbers, one per line:
+
+python-repl
+Copy code
+SRR7140069
+SRR7140058
+...
+3. Download SRA Data
+Use prefetch to download the SRA files:
+
+bash
+Copy code
+mkdir -p sra_files
+prefetch --option-file accession_list.txt --output-directory sra_files
+4. Convert SRA to FASTQ
+Convert the downloaded .sra files to compressed paired-end FASTQ files:
+
+bash
+Copy code
+mkdir -p fastq_files
+for sra_file in sra_files/*.sra; do
+    fastq-dump --split-files --gzip --outdir fastq_files "$sra_file"
+done
+5. Quality Control with FastQC
+Perform quality control checks on the FASTQ files:
+
+bash
+Copy code
+mkdir -p fastqc_reports
+fastqc fastq_files/*.fastq.gz --outdir fastqc_reports
+6. Automating the Pipeline
+To automate the above steps, create a script named run_pipeline.sh with the following content:
+
+bash
+Copy code
+#!/bin/bash
+
+# Load necessary modules
+module load sra-toolkit/2.10.9
+module load FastQC/0.11.9
+
+# Set up directories
+mkdir -p sra_files fastq_files fastqc_reports
+
+# Download SRA data
+prefetch --option-file accession_list.txt --output-directory sra_files
+
+# Convert SRA to FASTQ
+for sra_file in sra_files/*.sra; do
+    fastq-dump --split-files --gzip --outdir fastq_files "$sra_file"
+done
+
+# Perform quality control
+fastqc fastq_files/*.fastq.gz --outdir fastqc_reports
+
+echo "Pipeline execution completed successfully."
+Make the script executable and run it:
+
+bash
+Copy code
+chmod +x run_pipeline.sh
+./run_pipeline.sh
+Notes
+Ensure that the accession_list.txt file is in the same directory as the run_pipeline.sh script.
+
+Adjust module versions as necessary to match the versions installed in your environment.
+
+Monitor disk space, as SRA and FASTQ files can be large.
+
+References
+SRA Toolkit Documentation: https://github.com/ncbi/sra-tools
+
+FastQC Documentation: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+
+arduino
+Copy code
+
+This `README.md` provides a clear and detailed guide for setting up and running the pipeline, ensuring that users can follow along and understand each step of the process.
+::contentReference[oaicite:0]{index=0}
+ 
