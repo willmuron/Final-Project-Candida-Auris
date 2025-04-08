@@ -1,6 +1,4 @@
 
-markdown
-Copy code
 # SRA Data Processing Pipeline
 
 This pipeline automates the process of downloading sequencing data from the NCBI Sequence Read Archive (SRA), converting the data into FASTQ format, and performing quality control checks using FastQC.
