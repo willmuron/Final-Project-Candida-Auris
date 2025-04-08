@@ -1,0 +1,16 @@
+# SRA Data Processing Pipeline
+
+This pipeline automates the process of downloading sequencing data from the NCBI Sequence Read Archive (SRA), converting the data into FASTQ format, and performing quality control checks using FastQC.
+
+## Prerequisites
+
+Ensure that the following tools are installed and accessible in your environment:
+
+- [SRA Toolkit 2.10.9](https://github.com/ncbi/sra-tools)
+- [FastQC 0.11.9](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+
+On systems that use module management (e.g., HPC environments), load the necessary modules:
+
+```bash
+module load s
+
