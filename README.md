@@ -42,7 +42,7 @@ This step is outlined above in the **Biological Problem** and **Hypothesis** sec
 prefetch --option-file accession_list.txt
 
 # Convert each .sra file to paired-end FASTQ files
-for sra in $(cat accession_list.txt); do
+for sra in $(cat updated_accession_list.txt); do
     fastq-dump --split-files $sra
 done
 ```
