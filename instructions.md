@@ -150,3 +150,41 @@ sbatch run_mafft.sh
 ```
 
 # Use raxML to build phylogeny
+- Use the aligned sequences from MAFFT (antifungal_genes_aligned.fasta) as input. Create run_raxml.sh:
+```
+#!/bin/bash
+#SBATCH --job-name=raxml_tree
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=04:00:00
+#SBATCH --output=logs/raxml.out
+#SBATCH --mail-user=your_email@domain.edu
+#SBATCH --mail-type=END,FAIL
+
+module load raxml/8.2.12
+
+echo "Starting RAxML phylogeny construction..."
+
+raxmlHPC-PTHREADS -T 16 \
+ -s antifungal_genes_aligned.fasta \
+ -n candida_tree \
+ -m GTRGAMMA \
+ -p 12345 \
+ -# 100 \
+ -f a \
+ -x 12345
+
+echo "RAxML tree construction completed."
+```
+- Submit it with:
+```
+sbatch run_raxml.sh
+```
+#Output Files
+- After RAxML runs, you’ll get files like:
+
+- RAxML_bestTree.candida_tree — best-scoring ML tree
+
+- RAxML_bootstrap.candida_tree — bootstrap replicates
+
+- RAxML_bipartitions.candida_tree — best tree with bootstrap support
