@@ -117,7 +117,7 @@ sbatch assembly.slurm
 # Use mafft to align
    - Assume you've collected all target gene sequences from all samples into a    single FASTA file:
 
--   Copy code
+-   Copy code:
 
 ```
 antifungal_genes.fasta
@@ -142,6 +142,11 @@ echo "Starting MAFFT alignment..."
 mafft --thread 8 --auto antifungal_genes.fasta > antifungal_genes_aligned.fasta
 
 echo "Alignment completed."
+```
+
+- Submit job with command:
+```
+sbatch run_mafft.sh
 ```
 
 # Use raxML to build phylogeny
