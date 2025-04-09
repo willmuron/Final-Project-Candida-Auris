@@ -118,6 +118,8 @@ sbatch assembly.slurm
    - Assume you've collected all target gene sequences from all samples into a    single FASTA file:
 
 -   Copy code
+
+```
 antifungal_genes.fasta
 
 # Use raxML to build phylogeny
