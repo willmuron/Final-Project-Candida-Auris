@@ -23,7 +23,14 @@ vi download_sra.sh
 
 ```
 #!/bin/bash
-Will, copy and past script here
+# Use prefetch to download all files
+module load anaconda3
+conda activate sra-tools
+while read -r SRR; do
+   echo "Downloading $SRR..."
+   prefetch --max-size 100G $SRR
+   fasterq-dump $SRR --split-files -O fastq_files/
+done < accession_list.txt
 ```
 - Type `exit` twice (as needed) to exit the HPC.
 - Login again
