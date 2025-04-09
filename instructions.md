@@ -115,9 +115,9 @@ sbatch assembly.slurm
 ```
 
 # Use mafft to align
-#Assume you've collected all target gene sequences from all samples into a single FASTA file:
+   - Assume you've collected all target gene sequences from all samples into a    single FASTA file:
 
-#Copy code
+-   Copy code
 antifungal_genes.fasta
 
 # Use raxML to build phylogeny
