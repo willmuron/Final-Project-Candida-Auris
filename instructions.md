@@ -44,17 +44,23 @@ bash download_sra.sh
 - This script creates a folder `fastq_files/` which contains all of your sequences.
 
 # Download reference genome for the assembly
+```
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/013/715/GCF_003013715.1_ASM301371v2/GCF_003013715.1_ASM301371v2_genomic.fna.gz
-
+```
+```
 gunzip GCF_003013715.1_ASM301371v2_genomic.fna.gz
-
+```
+```
 mv GCF_003013715.1_ASM301371v2_genomic.fna reference.fasta
+```
 
 # Build bowtie index
+```
 module load bowtie2/2.4.4
-
+```
+```
 bowtie2-build reference.fasta candida_index
-
+```
 # Assemble genomes using bowtie2
 ```
 vi assembly.slurm
