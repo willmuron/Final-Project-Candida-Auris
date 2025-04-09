@@ -45,7 +45,9 @@ bash download_sra.sh
 
 # Download reference genome for the assembly
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/013/715/GCF_003013715.1_ASM301371v2/GCF_003013715.1_ASM301371v2_genomic.fna.gz
+
 gunzip GCF_003013715.1_ASM301371v2_genomic.fna.gz
+
 mv GCF_003013715.1_ASM301371v2_genomic.fna reference.fasta
 
 # Build bowtie index
