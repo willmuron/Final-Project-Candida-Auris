@@ -111,7 +111,7 @@ echo "Pipeline completed successfully!"
 ```
 
 ```
-bash assembly.slurm
+sbatch assembly.slurm
 ```
 
 # Use mafft to align
