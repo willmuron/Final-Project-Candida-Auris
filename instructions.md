@@ -121,5 +121,6 @@ sbatch assembly.slurm
 
 ```
 antifungal_genes.fasta
+```
 
 # Use raxML to build phylogeny
