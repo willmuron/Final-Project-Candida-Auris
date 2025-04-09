@@ -123,4 +123,25 @@ sbatch assembly.slurm
 antifungal_genes.fasta
 ```
 
+- Create a script called run_mafft.sh:
+
+```
+#!/bin/bash
+#SBATCH --job-name=mafft_alignment
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=16G
+#SBATCH --time=02:00:00
+#SBATCH --output=logs/mafft.out
+#SBATCH --mail-user=your_email@domain.edu
+#SBATCH --mail-type=END,FAIL
+
+module load mafft/7.475
+
+echo "Starting MAFFT alignment..."
+
+mafft --thread 8 --auto antifungal_genes.fasta > antifungal_genes_aligned.fasta
+
+echo "Alignment completed."
+```
+
 # Use raxML to build phylogeny
