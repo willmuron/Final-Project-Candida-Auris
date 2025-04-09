@@ -52,6 +52,7 @@ mv GCF_003013715.1_ASM301371v2_genomic.fna reference.fasta
 
 # Build bowtie index
 module load bowtie2/2.4.4
+
 bowtie2-build reference.fasta candida_index
 
 # Assemble genomes using bowtie2
