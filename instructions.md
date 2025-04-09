@@ -103,5 +103,10 @@ bcftools index ${SAMPLE}.vcf.gz
 
 echo "Pipeline completed successfully!"
 ```
+
+```
+bash assembly.slurm
+```
+
 # Use mafft to align
 # Use raxML to build phylogeny
