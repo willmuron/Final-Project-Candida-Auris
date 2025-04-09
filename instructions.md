@@ -180,7 +180,7 @@ echo "RAxML tree construction completed."
 ```
 sbatch run_raxml.sh
 ```
-#Output Files
+**#Output Files**
 - After RAxML runs, you’ll get files like:
 
 - RAxML_bestTree.candida_tree — best-scoring ML tree
