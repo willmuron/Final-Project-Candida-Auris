@@ -149,6 +149,8 @@ echo "Alignment completed."
 sbatch run_mafft.sh
 ```
 
+Jorge, add scrpit line from vcf to fasta
+
 # Use raxML to build phylogeny
 - Use the aligned sequences from MAFFT (antifungal_genes_aligned.fasta) as input. Create run_raxml.sh:
 ```
