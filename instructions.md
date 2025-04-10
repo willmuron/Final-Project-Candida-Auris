@@ -98,7 +98,7 @@ echo "Indexing BAM file..."
 samtools index ${SAMPLE}.bam
 
 echo "Calling SNPs with BCFtools..."
-bcftools mpileup -Ou -f reference.fasta ${SAMPLE}.bam | bcftools call -mv -Ob -o ${SAMPLE}.bcf
+bcftools mpileup -Ou -f reference.fasta ${SAMPLE}.bam | bcftools call -c -Ob -o ${SAMPLE}.bcf
 
 echo "Converting BCF to VCF..."
 bcftools view -Ov -o ${SAMPLE}.vcf ${SAMPLE}.bcf
