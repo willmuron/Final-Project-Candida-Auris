@@ -121,7 +121,13 @@ mv GCF_003013715.1_ASM301371v2_genomic.gff annotation.gff
 ```
 ```
 grep -i 'ERG11\|FKS1\|FKS2\|CDR1\|TAC1' annotation.gff > resistance_genes.gff
-awk '$3 == "gene" {print $1"\t"$4-1"\t"$5"\t"$9}' resistance_genes.gff > resistance_genes.bed
+
+awk '$3 == "CDS" {
+    match($0, /product=([^;]+)/, a);
+    gsub(/%2C/, ",", a[1]);  # decode comma if present
+    gsub(/ /, "_", a[1]);   # remove spaces for compatibility
+    print $1"\t"$4-1"\t"$5"\t"a[1]
+}' resistance_genes.gff > resistance_genes.bed
 ```
 - create script
 ```
