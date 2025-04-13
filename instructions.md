@@ -113,6 +113,49 @@ echo "Pipeline completed successfully!"
 ```
 sbatch assembly.slurm
 ```
+# Focusing on antifungal genes:
+```
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/013/715/GCF_003013715.1_ASM301371v2/GCF_003013715.1_ASM301371v2_genomic.gff.gz
+gunzip GCF_003013715.1_ASM301371v2_genomic.gff.gz
+mv GCF_003013715.1_ASM301371v2_genomic.gff annotation.gff
+```
+```
+grep -i 'ERG11\|FKS1\|FKS2\|CDR1\|TAC1' annotation.gff > resistance_genes.gff
+awk '$3 == "gene" {print $1"\t"$4-1"\t"$5"\t"$9}' resistance_genes.gff > resistance_genes.bed
+```
+- create script
+```
+vi merge_vcf.sh
+```
+-Type I to edit and paste:
+```
+#!/bin/bash
+module load bcftools
+
+# Step 1: Extract resistance gene SNPs from each .vcf.gz
+for file in *.vcf.gz; do
+    base=$(basename "$file" .vcf.gz)
+    echo "Extracting SNPs from $file..."
+    bcftools view -R resistance_genes.bed "$file" -Oz -o "${base}.resistance.vcf.gz"
+    tabix -p vcf "${base}.resistance.vcf.gz"
+done
+
+# Step 2: Merge all filtered VCFs
+echo "Merging all resistance VCFs..."
+bcftools merge *.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
+tabix -p vcf merged_resistance.vcf.gz
+
+# Step 3: Convert merged VCF to SNP matrix
+echo "Generating SNP matrix..."
+bcftools query -f '%CHROM\t%POS[\t%GT]\n' merged_resistance.vcf.gz > snp_matrix.tsv
+
+echo "All done!"
+```
+- run script:
+```
+bash merge_vcf.sh
+```
+
 
 # Use mafft to align
    - Assume you've collected all target gene sequences from all samples into a    single FASTA file:
