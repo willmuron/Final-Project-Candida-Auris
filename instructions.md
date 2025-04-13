@@ -166,7 +166,7 @@ bash merge_vcf.sh
 module load python/3.8.6 
 python vcf2phylip.py -i merged_resistance.vcf.gz -m2
 ```
-- NOTE that the python script vcf2phylip.py has been added to this repository and will be downloaded to the HPC when you fork it.
+- NOTE that the python script vcf2phylip.py has been added to this repository and will be downloaded to the HPC when you clone it.
 
 
 # Run Raxml
