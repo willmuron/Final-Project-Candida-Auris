@@ -155,76 +155,26 @@ echo "All done!"
 ```
 bash merge_vcf.sh
 ```
-
-
-# Use mafft to align
-   - Assume you've collected all target gene sequences from all samples into a    single FASTA file:
-
--   Copy code:
-
+# Let conver vcf to phyllip to run phylogenetic analysis (avoids mafft)
 ```
-antifungal_genes.fasta
+module load python/3.8.6 
+python vcf2phylip.py -i merged_resistance.vcf.gz -m2
 ```
+- NOTE that the python script vcf2phylip.py has been added to this repository and will be downloaded to the HPC when you fork it.
 
-- Create a script called run_mafft.sh:
 
+# Run Raxml
 ```
-#!/bin/bash
-#SBATCH --job-name=mafft_alignment
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=16G
-#SBATCH --time=02:00:00
-#SBATCH --output=logs/mafft.out
-#SBATCH --mail-user=your_email@domain.edu
-#SBATCH --mail-type=END,FAIL
-
-module load mafft/7.475
-
-echo "Starting MAFFT alignment..."
-
-mafft --thread 8 --auto antifungal_genes.fasta > antifungal_genes_aligned.fasta
-
-echo "Alignment completed."
+module load RAxML
+raxmlHPC -s merged_resistance.min2.phy -n antifungal -m GTRCAT -p 12345 -b 12345 -# 100 -f a
 ```
+- change merged_resistance.min2.phy with name of file produced by python script above
 
-- Submit job with command:
-```
-sbatch run_mafft.sh
-```
+# Visualize tree in iTOL
+https://itol.embl.de/upload.cgi
 
-Jorge, add scrpit line from vcf to fasta
+- Make sure you display bootstrap support value in nodes.
 
-# Use raxML to build phylogeny
-- Use the aligned sequences from MAFFT (antifungal_genes_aligned.fasta) as input. Create run_raxml.sh:
-```
-#!/bin/bash
-#SBATCH --job-name=raxml_tree
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
-#SBATCH --time=04:00:00
-#SBATCH --output=logs/raxml.out
-#SBATCH --mail-user=your_email@domain.edu
-#SBATCH --mail-type=END,FAIL
-
-module load raxml/8.2.12
-
-echo "Starting RAxML phylogeny construction..."
-
-raxmlHPC-PTHREADS -T 16 \
- -s antifungal_genes_aligned.fasta \
- -n candida_tree \
- -m GTRGAMMA \
- -p 12345 \
- -# 100 \
- -f a \
- -x 12345
-
-echo "RAxML tree construction completed."
-```
-- Submit it with:
-```
-sbatch run_raxml.sh
-```
 **Output Files**
 - After RAxML runs, you’ll get files like:
 
@@ -233,3 +183,5 @@ sbatch run_raxml.sh
 - RAxML_bootstrap.candida_tree — bootstrap replicates
 
 - RAxML_bipartitions.candida_tree — best tree with bootstrap support
+
+
