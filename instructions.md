@@ -89,6 +89,8 @@ module load bowtie2/2.4.4
 bowtie2 --very-fast-local -p 16 -x candida_index -1 fastq_files/${SAMPLE}_1.fastq -2 fastq_files/${SAMPLE}_2.fastq -S ${SAMPLE}.sam
 
 module load samtools
+module load samtools
+module load htslib
 
 echo "Converting and Sorting BAM in one step..."
 samtools view -@ 16 -bS ${SAMPLE}.sam | samtools sort -@ 16 -m 16G -T /scratch/tmp_sort -o ${SAMPLE}.bam
@@ -137,7 +139,7 @@ module load bcftools
 module load htslib
 
 for file in *.vcf.gz; do
-    tabix -f -p vcf "${file}.gz"
+    tabix -f -p vcf "${file}"
 done
 ```
 2. create script to merge vcf files
