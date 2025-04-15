@@ -93,7 +93,7 @@ module load bcftools
 module load htslib
 
 echo "Converting and Sorting BAM in one step..."
-samtools view -@ 16 -bS ${SAMPLE}.sam | samtools sort -@ 16 -m 16G -T /scratch/tmp_sort -o ${SAMPLE}.bam
+samtools view -@ 16 -bS ${SAMPLE}.sam | samtools sort -@ 16 -m 30G -T /scratch/tmp_sort -o ${SAMPLE}.bam
 rm ${SAMPLE}.sam
 
 echo "Indexing BAM file..."
@@ -108,6 +108,7 @@ bcftools view -Ov -o ${SAMPLE}.vcf ${SAMPLE}.bcf
 echo "Compressing and indexing VCF..."
 bgzip -c ${SAMPLE}.vcf > ${SAMPLE}.vcf.gz
 bcftools index ${SAMPLE}.vcf.gz
+tabix -p vcf ${SAMPLE}.tab.vcf.gz
 
 echo "Pipeline completed successfully!"
 ```
