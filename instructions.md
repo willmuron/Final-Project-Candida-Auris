@@ -63,6 +63,7 @@ bowtie2-build reference.fasta candida_index
 ```
 # Assemble genomes using bowtie2
 ```
+rm assembly.slurm
 vi assembly.slurm
 ```
 - Type I, copy and paste the following:
