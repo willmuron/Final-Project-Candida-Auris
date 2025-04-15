@@ -142,6 +142,15 @@ for file in *.vcf.gz; do
     tabix -f -p vcf "${file}"
 done
 ```
+```
+for file in *.vcf.gz; do
+    base=$(basename "$file" .vcf.gz)
+    gunzip -c "$file" | bgzip -c > "${base}.vcf.bgz"
+    mv "${base}.vcf.bgz" "${base}.vcf.gz"
+    tabix -f -p vcf "${base}.vcf.gz"
+done
+```
+
 2. create script to merge vcf files
 ```
 vi merge_vcf.sh
