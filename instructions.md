@@ -113,6 +113,7 @@ echo "Pipeline completed successfully!"
 ```
 sbatch assembly.slurm
 ```
+---
 # Focusing on antifungal genes:
 ```
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/013/715/GCF_003013715.1_ASM301371v2/GCF_003013715.1_ASM301371v2_genomic.gff.gz
@@ -129,7 +130,17 @@ awk '$3 == "CDS" {
     print $1"\t"$4-1"\t"$5"\t"a[1]
 }' resistance_genes.gff > resistance_genes.bed
 ```
-- create script
+## Extract antifungal SNPs from vcf files
+1. Index vcf.gz files with tabix
+```
+module load bcftools
+module load htslib
+
+for file in *.vcf.gz; do
+    tabix -f -p vcf "${file}.gz"
+done
+```
+2. create script to merge vcf files
 ```
 vi merge_vcf.sh
 ```
@@ -137,6 +148,7 @@ vi merge_vcf.sh
 ```
 #!/bin/bash
 module load bcftools
+module load htslib
 
 # Step 1: Extract resistance gene SNPs from each .vcf.gz
 for file in *.vcf.gz; do
@@ -161,7 +173,7 @@ echo "All done!"
 ```
 bash merge_vcf.sh
 ```
-# Let conver vcf to phyllip to run phylogenetic analysis (avoids mafft)
+# Let convert vcf to phyllip to run phylogenetic analysis (avoids mafft)
 ```
 module load python/3.8.6 
 python vcf2phylip.py -i merged_resistance.vcf.gz -m2
