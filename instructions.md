@@ -94,7 +94,7 @@ module load bcftools
 module load htslib
 
 echo "Converting and Sorting BAM in one step..."
-samtools view -@ 8 -bS ${SAMPLE}.sam | samtools sort -@ 8 -m 2G -T /scratch/tmp_sort -o ${SAMPLE}.bam
+samtools view -@ 8 -bS ${SAMPLE}.sam | samtools sort -@ 8 -m 4G -T /scratch/tmp_sort -o ${SAMPLE}.bam
 rm ${SAMPLE}.sam
 
 echo "Indexing BAM file..."
