@@ -87,7 +87,7 @@ echo "Processing $SAMPLE..."
 
 module load bowtie2/2.4.4
 
-bowtie2 --very-fast-local -p 16 -x candida_index -1 fastq_files/${SAMPLE}_1.fastq -2 fastq_files/${SAMPLE}_2.fastq -S ${SAMPLE}.sam
+bowtie2 --very-fast-local -p 8 -x candida_index -1 fastq_files/${SAMPLE}_1.fastq -2 fastq_files/${SAMPLE}_2.fastq -S ${SAMPLE}.sam
 
 module load samtools
 module load bcftools
