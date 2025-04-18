@@ -125,7 +125,7 @@ gunzip GCF_003013715.1_ASM301371v2_genomic.gff.gz
 mv GCF_003013715.1_ASM301371v2_genomic.gff annotation.gff
 ```
 ```
-grep -i 'ERG11\|FKS1\|FKS2\|CDR1\|TAC1' annotation.gff > resistance_genes.gff
+grep -i 'CYP51\|FKS1\|1,3-beta-glucan synthase\|CDR1\|Tachykinin' annotation.gff > resistance_genes.gff
 
 awk '$3 == "CDS" {
     match($0, /product=([^;]+)/, a);
