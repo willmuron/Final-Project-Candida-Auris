@@ -157,13 +157,13 @@ mkdir -p "$FILTERED_DIR"
 for file in "$VCF_DIR"/*.vcf.gz; do
     base=$(basename "$file" .vcf.gz)
     echo "Extracting SNPs from $file..."
-    bcftools view -R resistance_genes.bed "$file" -Oz -o "$FILTERED_DIR/${base}.resistance.vcf.gz"
+    bcftools view -R resistance_genes_expanded.bed "$file" -Oz -o "$FILTERED_DIR/${base}.resistance.vcf.gz"
     tabix -p vcf "$FILTERED_DIR/${base}.resistance.vcf.gz"
 done
 
 # Step 2: Merge all filtered VCFs
 echo "Merging all resistance VCFs..."
-bcftools merge "$FILTERED_DIR"/*.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
+bcftools merge filtered_vcfs/*.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
 tabix -p vcf merged_resistance.vcf.gz
 
 # Extract only informative    SNPS
