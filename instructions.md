@@ -166,6 +166,20 @@ echo "Merging all resistance VCFs..."
 bcftools merge "$FILTERED_DIR"/*.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
 tabix -p vcf merged_resistance.vcf.gz
 
+# Extract only informative    SNPS
+```
+module load bcftools
+module load htslib
+bcftools view -v snps merged_resistance.vcf.gz -Oz -o snps_only.vcf.gz
+tabix -p vcf snps_only.vcf.gz
+bedtools intersect -a snps_only.vcf.gz -b resistance_genes_expanded.bed -wa -wb > snps_with_genes.txt
+bcftools query -l snps_only.vcf.gz > sample_names.txt
+```
+- push to repo
+
+#
+
+
 # Step 3: Convert merged VCF to SNP matrix
 echo "Generating SNP matrix..."
 bcftools query -f '%CHROM\t%POS[\t%GT]\n' merged_resistance.vcf.gz > snp_matrix.tsv
