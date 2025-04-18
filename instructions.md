@@ -132,7 +132,7 @@ awk '$3 == "CDS" {
     gsub(/%2C/, ",", a[1]);  # decode comma if present
     gsub(/ /, "_", a[1]);   # remove spaces for compatibility
     print $1"\t"$4-1"\t"$5"\t"a[1]
-}' resistance_genes.gff > resistance_genes.bed
+}' resistance_genes.gff > resistance_genes_expanded.bed
 ```
 ## Extract antifungal SNPs from vcf files
 1. create script to merge vcf files
