@@ -135,45 +135,35 @@ awk '$3 == "CDS" {
 }' resistance_genes.gff > resistance_genes.bed
 ```
 ## Extract antifungal SNPs from vcf files
-1. Index vcf.gz files with tabix
-```
-module load bcftools
-module load htslib
-
-for file in *.vcf.gz; do
-    tabix -f -p vcf "${file}"
-done
-```
-```
-for file in *.vcf.gz; do
-    base=$(basename "$file" .vcf.gz)
-    gunzip -c "$file" | bgzip -c > "${base}.vcf.bgz"
-    mv "${base}.vcf.bgz" "${base}.vcf.gz"
-    tabix -f -p vcf "${base}.vcf.gz"
-done
-```
-
-2. create script to merge vcf files
+1. create script to merge vcf files
 ```
 vi merge_vcf.sh
 ```
 -Type I to edit and paste:
 ```
 #!/bin/bash
+set -euo pipefail
+
+# Load necessary modules
 module load bcftools
 module load htslib
 
+# Define directories
+VCF_DIR="vcfs"
+FILTERED_DIR="filtered_vcfs"
+mkdir -p "$FILTERED_DIR"
+
 # Step 1: Extract resistance gene SNPs from each .vcf.gz
-for file in *.vcf.gz; do
+for file in "$VCF_DIR"/*.vcf.gz; do
     base=$(basename "$file" .vcf.gz)
     echo "Extracting SNPs from $file..."
-    bcftools view -R resistance_genes.bed "$file" -Oz -o "${base}.resistance.vcf.gz"
-    tabix -p vcf "${base}.resistance.vcf.gz"
+    bcftools view -R resistance_genes.bed "$file" -Oz -o "$FILTERED_DIR/${base}.resistance.vcf.gz"
+    tabix -p vcf "$FILTERED_DIR/${base}.resistance.vcf.gz"
 done
 
 # Step 2: Merge all filtered VCFs
 echo "Merging all resistance VCFs..."
-bcftools merge *.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
+bcftools merge "$FILTERED_DIR"/*.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
 tabix -p vcf merged_resistance.vcf.gz
 
 # Step 3: Convert merged VCF to SNP matrix
@@ -186,18 +176,28 @@ echo "All done!"
 ```
 bash merge_vcf.sh
 ```
-# Let convert vcf to phyllip to run phylogenetic analysis (avoids mafft)
+# Let convert vcf to phyllip to run phylogenetic analysis (avoids mafft) - Make sure vcf2phylip file is in the current directory
 ```
 module load python/3.8.6 
 python vcf2phylip.py -i merged_resistance.vcf.gz -m2
 ```
 - NOTE that the python script vcf2phylip.py has been added to this repository and will be downloaded to the HPC when you clone it.
 
+- Clean file to remove samples with no nucleotides
+
+```
+awk 'NR==1 {len=$2; next} 
+     $2 ~ /[^Nn?-]/ {print $0 > "filtered_body.phy"; c++} 
+     END {print c, len > "filtered_head.phy"}' merged_resistance.min2.phy
+
+cat filtered_head.phy filtered_body.phy > cleaned.phy
+rm filtered_head.phy filtered_body.phy
+```
 
 # Run Raxml
 ```
 module load RAxML
-raxmlHPC -s merged_resistance.min2.phy -n antifungal -m GTRCAT -p 12345 -b 12345 -# 100 -f a
+raxmlHPC -s merged_resistance.min2.phy -n antifungal3 -m GTRCAT -p 12345 -x 12345 -# 100 -f a
 ```
 - change merged_resistance.min2.phy with name of file produced by python script above
 
