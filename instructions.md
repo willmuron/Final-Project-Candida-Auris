@@ -197,9 +197,46 @@ rm filtered_head.phy filtered_body.phy
 # Run Raxml
 ```
 module load RAxML
-raxmlHPC -s merged_resistance.min2.phy -n antifungal3 -m GTRCAT -p 12345 -x 12345 -# 100 -f a
+raxmlHPC -s merged_resistance.min2.phy -n antifungal3 -m GTRCAT -p 12345 -x 12345 -# 1000 -f a
 ```
 - change merged_resistance.min2.phy with name of file produced by python script above
+
+# Other analysis
+
+```
+module load bedtools
+bedtools intersect -a merged_resistance.vcf.gz -b resistance_genes_expanded.bed -wa -wb > snps_with_gene.txt
+```
+
+submit to github
+
+- viszlize using R
+```
+library(tidyverse)
+
+# Read file (VCF + BED joined)
+df <- read.table("snps_with_gene.txt", header = FALSE, stringsAsFactors = FALSE)
+
+# If your BED file has 4 columns (with gene name), extract it:
+# VCF: CHROM POS ID REF ALT QUAL FILTER INFO FORMAT SAMPLE...
+# BED: CHROM START END GENE
+
+gene_col <- ncol(df)  # gene name will be last column
+colnames(df)[gene_col] <- "Gene"
+
+# Count SNPs per gene
+snp_counts <- df %>%
+  count(Gene, name = "SNPs")
+
+# Plot
+ggplot(snp_counts, aes(x = reorder(Gene, SNPs), y = SNPs)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "SNP Count per Resistance Gene",
+       x = "Gene",
+       y = "Number of SNPs") +
+  theme_minimal()
+```
 
 # Visualize tree in iTOL
 https://itol.embl.de/upload.cgi
