@@ -273,7 +273,7 @@ rm filtered_head.phy filtered_body.phy
 # Run Raxml
 ```
 module load RAxML
-raxmlHPC -s merged_resistance.min2.phy -n antifungal3 -m GTRCAT -p 12345 -x 12345 -# 1000 -f a
+raxmlHPC -s cleaned.phy -n antifungal3 -m GTRCAT -p 12345 -x 12345 -# 1000 -f a
 ```
 - change merged_resistance.min2.phy with name of file produced by python script above
 
