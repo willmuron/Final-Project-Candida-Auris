@@ -165,6 +165,15 @@ done
 echo "Merging all resistance VCFs..."
 bcftools merge filtered_vcfs/*.resistance.vcf.gz -Oz -o merged_resistance.vcf.gz
 tabix -p vcf merged_resistance.vcf.gz
+echo "Generating SNP matrix..."
+bcftools query -f '%CHROM\t%POS[\t%GT]\n' merged_resistance.vcf.gz > snp_matrix.tsv
+
+echo "All done!"
+```
+- run script:
+```
+bash merge_vcf.sh
+```
 
 # Extract only informative    SNPS
 ```
@@ -177,19 +186,72 @@ bcftools query -l snps_only.vcf.gz > sample_names.txt
 ```
 - push to repo
 
-#
+# Visualize snps in antifungal genes in R
+```R
+library(tidyverse)
 
+# Load SNP + gene file
+df <- read.table("snps_with_genes2.txt", header = FALSE, stringsAsFactors = FALSE)
+
+# Load sample names and metadata
+samples <- readLines("sample_names.txt")
+metadata <- read.table("sample_metadata.tsv", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+# Assign column names
+colnames(df)[1:9] <- c("CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT")
+colnames(df)[10:(9 + length(samples))] <- samples
+colnames(df)[(10 + length(samples)):(10 + length(samples) + 2)] <- c("GENE_CHROM", "GENE_START", "GENE_END")
+colnames(df)[(10 + length(samples) + 3)] <- "GENE"
+
+# Extract relevant columns and reshape
+genos <- df[, c("CHROM", "POS", samples, "GENE")]
+
+genos_long <- genos %>%
+  pivot_longer(cols = all_of(samples), names_to = "Sample", values_to = "GT_RAW") %>%
+  mutate(GT = sub(":.*", "", GT_RAW)) %>%
+  filter(GT %in% c("0/1", "1/1")) %>%
+  count(GENE, Sample)
+
+metadata <- metadata %>%
+  mutate(
+    SampleID = sub("\\.bam$", "", SamplsID),  # strip ".bam"
+    Label = paste(SampleID, Country, Source, sep = "_")
+  )
+
+annotated <- genos_long %>%
+  mutate(Sample = sub("\\.bam$", "", Sample)) %>%  # strip ".bam" from genos_long
+  left_join(metadata, by = c("Sample" = "SampleID"))
+
+library(viridis)
+
+ggplot(annotated, aes(x = Label, y = GENE, fill = n)) +
+  geom_tile(color = "white", linewidth = 0.4) +
+  scale_fill_gradientn(
+    colors = c("navy", "white", "firebrick"),
+    values = scales::rescale(c(min(annotated$n), median(annotated$n), max(annotated$n))),
+    name = "SNP count"
+  ) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "SNPs per Gene per Sample",
+    x = NULL,
+    y = "Gene"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+    axis.text.y = element_text(size = 14),
+    axis.title.y = element_text(size = 16),
+    plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    panel.grid = element_blank()
+  )
+```
+
+# PHYLOGENETIC TREE
 
 # Step 3: Convert merged VCF to SNP matrix
-echo "Generating SNP matrix..."
-bcftools query -f '%CHROM\t%POS[\t%GT]\n' merged_resistance.vcf.gz > snp_matrix.tsv
 
-echo "All done!"
-```
-- run script:
-```
-bash merge_vcf.sh
-```
 # Let convert vcf to phyllip to run phylogenetic analysis (avoids mafft) - Make sure vcf2phylip file is in the current directory
 ```
 module load python/3.8.6 
@@ -215,55 +277,11 @@ raxmlHPC -s merged_resistance.min2.phy -n antifungal3 -m GTRCAT -p 12345 -x 1234
 ```
 - change merged_resistance.min2.phy with name of file produced by python script above
 
-# Other analysis
-
-```
-module load bedtools
-bedtools intersect -a merged_resistance.vcf.gz -b resistance_genes_expanded.bed -wa -wb > snps_with_gene.txt
-```
-
-submit to github
-
-- viszlize using R
-```
-library(tidyverse)
-
-# Read file (VCF + BED joined)
-df <- read.table("snps_with_gene.txt", header = FALSE, stringsAsFactors = FALSE)
-
-# If your BED file has 4 columns (with gene name), extract it:
-# VCF: CHROM POS ID REF ALT QUAL FILTER INFO FORMAT SAMPLE...
-# BED: CHROM START END GENE
-
-gene_col <- ncol(df)  # gene name will be last column
-colnames(df)[gene_col] <- "Gene"
-
-# Count SNPs per gene
-snp_counts <- df %>%
-  count(Gene, name = "SNPs")
-
-# Plot
-ggplot(snp_counts, aes(x = reorder(Gene, SNPs), y = SNPs)) +
-  geom_col(fill = "steelblue") +
-  coord_flip() +
-  labs(title = "SNP Count per Resistance Gene",
-       x = "Gene",
-       y = "Number of SNPs") +
-  theme_minimal()
-```
-
 # Visualize tree in iTOL
 https://itol.embl.de/upload.cgi
 
 - Make sure you display bootstrap support value in nodes.
 
-**Output Files**
-- After RAxML runs, you’ll get files like:
 
-- RAxML_bestTree.candida_tree — best-scoring ML tree
-
-- RAxML_bootstrap.candida_tree — bootstrap replicates
-
-- RAxML_bipartitions.candida_tree — best tree with bootstrap support
 
 
